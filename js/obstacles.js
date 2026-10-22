@@ -1,6 +1,6 @@
 /**
  * obstacles.js
- * Cacti, birds and unicorns, plus the manager that spawns, moves and tests them.
+ * Cacti, birds and (white pixel) unicorns, plus the manager that spawns, moves and tests them.
  */
 (function (global) {
   'use strict';
@@ -105,8 +105,22 @@
   /* Unicorn: a galloping ground obstacle, wider and taller than a    */
   /* cactus, so it needs a well-timed jump                            */
   /* ---------------------------------------------------------------- */
-  const UNICORN_RAINBOW = ['#e8629a', '#f2a03d', '#4fb7e8', '#8e7cf0'];
-  const UNICORN_HORN = '#e9b82f';
+  const UNICORN_WHITE = '#ffffff';
+  const OUTLINE = 2; // px of dark outline so the white sprite stays visible on a light stage
+
+  // Body parts as [x, y, width, height] rectangles, relative to the sprite's top-left.
+  const UNICORN_BODY = [
+    [16, 18, 34, 14],  // body
+    [14, 10, 9, 12],   // neck
+    [2, 10, 16, 12],   // head
+    [0, 15, 5, 7],     // snout
+    [14, 6, 4, 5],     // ear
+    [23, 8, 3, 14],    // mane
+    [50, 18, 6, 18],   // tail
+  ];
+  // Legs alternate between two poses to look like a gallop: [x, height in pose A, height in pose B]
+  const UNICORN_LEGS = [[18, 14, 9], [26, 9, 14], [38, 14, 9], [45, 9, 14]];
+  const UNICORN_HORN = [[8, 0], [5, 10], [12, 10]];
 
   class Unicorn extends Obstacle {
     constructor(x) {
@@ -122,41 +136,37 @@
     draw(ctx, colors) {
       const x = Math.round(this.x);
       const y = Math.round(this.y);
-      const rect = (rx, ry, rw, rh) => ctx.fillRect(x + rx, y + ry, rw, rh);
       const phaseA = Math.floor(this.gallop / 0.12) % 2 === 0;
+      const parts = UNICORN_BODY.concat(
+        UNICORN_LEGS.map(([lx, hA, hB]) => [lx, 32, 5, phaseA ? hA : hB])
+      );
 
-      // Body, neck, head and ear (the unicorn faces left, the way it is travelling)
+      const horn = () => {
+        ctx.beginPath();
+        UNICORN_HORN.forEach(([px, py], i) => (i ? ctx.lineTo(x + px, y + py) : ctx.moveTo(x + px, y + py)));
+        ctx.closePath();
+      };
+
+      // Pass 1: the whole silhouette, grown by OUTLINE px, in the foreground colour.
       ctx.fillStyle = colors.fg;
-      rect(16, 18, 34, 14);   // body
-      rect(14, 10, 9, 12);    // neck
-      rect(2, 10, 16, 12);    // head
-      rect(0, 15, 5, 7);      // snout
-      rect(14, 6, 4, 5);      // ear
-      // Legs: front pair and back pair alternate, so it looks like it is galloping
-      rect(18, 32, 5, phaseA ? 14 : 9);
-      rect(26, 32, 5, phaseA ? 9 : 14);
-      rect(38, 32, 5, phaseA ? 14 : 9);
-      rect(45, 32, 5, phaseA ? 9 : 14);
+      for (const [px, py, pw, ph] of parts) {
+        ctx.fillRect(x + px - OUTLINE, y + py - OUTLINE, pw + OUTLINE * 2, ph + OUTLINE * 2);
+      }
+      ctx.strokeStyle = colors.fg;
+      ctx.lineWidth = OUTLINE * 2;
+      ctx.lineJoin = 'miter';
+      horn();
+      ctx.stroke();
 
-      // Horn
-      ctx.fillStyle = UNICORN_HORN;
-      ctx.beginPath();
-      ctx.moveTo(x + 8, y);
-      ctx.lineTo(x + 5, y + 10);
-      ctx.lineTo(x + 12, y + 10);
-      ctx.closePath();
+      // Pass 2: fill everything in white, which leaves just a clean outline showing.
+      ctx.fillStyle = UNICORN_WHITE;
+      for (const [px, py, pw, ph] of parts) ctx.fillRect(x + px, y + py, pw, ph);
+      horn();
       ctx.fill();
 
-      // Rainbow mane down the neck and a rainbow tail
-      UNICORN_RAINBOW.forEach((colour, i) => {
-        ctx.fillStyle = colour;
-        rect(23, 8 + i * 4, 3, 5);                  // mane
-        rect(50, 18 + i * 5, 6, 4);                 // tail
-      });
-
       // Eye
-      ctx.fillStyle = colors.stage;
-      rect(7, 13, 3, 3);
+      ctx.fillStyle = colors.fg;
+      ctx.fillRect(x + 7, y + 13, 3, 3);
     }
   }
 
