@@ -1,6 +1,6 @@
 /**
  * obstacles.js
- * Cacti and birds, plus the manager that spawns, moves and tests them.
+ * Cacti, birds and unicorns, plus the manager that spawns, moves and tests them.
  */
 (function (global) {
   'use strict';
@@ -102,6 +102,65 @@
   }
 
   /* ---------------------------------------------------------------- */
+  /* Unicorn: a galloping ground obstacle, wider and taller than a    */
+  /* cactus, so it needs a well-timed jump                            */
+  /* ---------------------------------------------------------------- */
+  const UNICORN_RAINBOW = ['#e8629a', '#f2a03d', '#4fb7e8', '#8e7cf0'];
+  const UNICORN_HORN = '#e9b82f';
+
+  class Unicorn extends Obstacle {
+    constructor(x) {
+      super(x, CONFIG.groundY, 56, 46);
+      this.gallop = Math.random();
+    }
+
+    update(dt, speed) {
+      super.update(dt, speed);
+      this.gallop += dt;
+    }
+
+    draw(ctx, colors) {
+      const x = Math.round(this.x);
+      const y = Math.round(this.y);
+      const rect = (rx, ry, rw, rh) => ctx.fillRect(x + rx, y + ry, rw, rh);
+      const phaseA = Math.floor(this.gallop / 0.12) % 2 === 0;
+
+      // Body, neck, head and ear (the unicorn faces left, the way it is travelling)
+      ctx.fillStyle = colors.fg;
+      rect(16, 18, 34, 14);   // body
+      rect(14, 10, 9, 12);    // neck
+      rect(2, 10, 16, 12);    // head
+      rect(0, 15, 5, 7);      // snout
+      rect(14, 6, 4, 5);      // ear
+      // Legs: front pair and back pair alternate, so it looks like it is galloping
+      rect(18, 32, 5, phaseA ? 14 : 9);
+      rect(26, 32, 5, phaseA ? 9 : 14);
+      rect(38, 32, 5, phaseA ? 14 : 9);
+      rect(45, 32, 5, phaseA ? 9 : 14);
+
+      // Horn
+      ctx.fillStyle = UNICORN_HORN;
+      ctx.beginPath();
+      ctx.moveTo(x + 8, y);
+      ctx.lineTo(x + 5, y + 10);
+      ctx.lineTo(x + 12, y + 10);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rainbow mane down the neck and a rainbow tail
+      UNICORN_RAINBOW.forEach((colour, i) => {
+        ctx.fillStyle = colour;
+        rect(23, 8 + i * 4, 3, 5);                  // mane
+        rect(50, 18 + i * 5, 6, 4);                 // tail
+      });
+
+      // Eye
+      ctx.fillStyle = colors.stage;
+      rect(7, 13, 3, 3);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
   /* Manager                                                          */
   /* ---------------------------------------------------------------- */
   class ObstacleManager {
@@ -128,11 +187,19 @@
 
     _spawn(speed, score) {
       const x = CONFIG.canvas.width + 20;
-      const canSpawnBird = score >= cfg.birdsAfterScore;
-      const obstacle = canSpawnBird && Math.random() < cfg.birdChance ? new Bird(x) : new Cactus(x);
-      this.items.push(obstacle);
+      this.items.push(this._createObstacle(x, score));
       // Gaps are measured in seconds of travel, so they scale with speed and stay fair.
       this.nextGap = speed * rand(cfg.minGapSeconds, cfg.maxGapSeconds);
+    }
+
+    /** Picks an obstacle type; rarer types unlock as the score grows. */
+    _createObstacle(x, score) {
+      const birdP = score >= cfg.birdsAfterScore ? cfg.birdChance : 0;
+      const unicornP = score >= cfg.unicornsAfterScore ? cfg.unicornChance : 0;
+      const roll = Math.random();
+      if (roll < birdP) return new Bird(x);
+      if (roll < birdP + unicornP) return new Unicorn(x);
+      return new Cactus(x);
     }
 
     /** @param {{x:number,y:number,w:number,h:number}} box */

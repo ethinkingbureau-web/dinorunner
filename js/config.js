@@ -39,7 +39,9 @@
       minGapSeconds: 0.85,  // gap between obstacles, expressed in seconds of travel
       maxGapSeconds: 1.7,
       birdsAfterScore: 300, // birds only appear once the player is warmed up
-      birdChance: 0.28,
+      birdChance: 0.22,
+      unicornsAfterScore: 100,
+      unicornChance: 0.25,
       hitboxInset: 4,
     },
 
