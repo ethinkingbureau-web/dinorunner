@@ -1,6 +1,6 @@
 /**
  * obstacles.js
- * Cacti, birds and (white pixel) unicorns, plus the manager that spawns, moves and tests them.
+ * Cacti, birds and unicorns, plus the manager that spawns, moves and tests them.
  */
 (function (global) {
   'use strict';
@@ -105,9 +105,6 @@
   /* Unicorn: a galloping ground obstacle, wider and taller than a    */
   /* cactus, so it needs a well-timed jump                            */
   /* ---------------------------------------------------------------- */
-  const UNICORN_WHITE = '#ffffff';
-  const OUTLINE = 2; // px of dark outline so the white sprite stays visible on a light stage
-
   // Body parts as [x, y, width, height] rectangles, relative to the sprite's top-left.
   const UNICORN_BODY = [
     [16, 18, 34, 14],  // body
@@ -147,25 +144,14 @@
         ctx.closePath();
       };
 
-      // Pass 1: the whole silhouette, grown by OUTLINE px, in the foreground colour.
+      // Solid silhouette in the foreground colour, matching the dino's pixel style.
       ctx.fillStyle = colors.fg;
-      for (const [px, py, pw, ph] of parts) {
-        ctx.fillRect(x + px - OUTLINE, y + py - OUTLINE, pw + OUTLINE * 2, ph + OUTLINE * 2);
-      }
-      ctx.strokeStyle = colors.fg;
-      ctx.lineWidth = OUTLINE * 2;
-      ctx.lineJoin = 'miter';
-      horn();
-      ctx.stroke();
-
-      // Pass 2: fill everything in white, which leaves just a clean outline showing.
-      ctx.fillStyle = UNICORN_WHITE;
       for (const [px, py, pw, ph] of parts) ctx.fillRect(x + px, y + py, pw, ph);
       horn();
       ctx.fill();
 
       // Eye
-      ctx.fillStyle = colors.fg;
+      ctx.fillStyle = colors.stage;
       ctx.fillRect(x + 7, y + 13, 3, 3);
     }
   }
