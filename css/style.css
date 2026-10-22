@@ -1,0 +1,128 @@
+:root {
+  --bg: #f4f4f1;
+  --stage-bg: #fbfbf9;
+  --fg: #3d3d3d;
+  --muted: #8a8a85;
+  --hill: #e6e6e1;
+  --cloud: #dcdcd6;
+  --accent: #3d3d3d;
+  --accent-fg: #fbfbf9;
+  --overlay: rgba(251, 251, 249, 0.86);
+  --border: #d4d4ce;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17181a;
+    --stage-bg: #1f2124;
+    --fg: #e4e4e0;
+    --muted: #8d8f93;
+    --hill: #2a2d31;
+    --cloud: #33363b;
+    --accent: #e4e4e0;
+    --accent-fg: #17181a;
+    --overlay: rgba(31, 33, 36, 0.88);
+    --border: #35383d;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.game {
+  width: min(100% - 32px, 860px);
+  padding: 24px 0;
+}
+
+.game__title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.stage {
+  position: relative;
+  background: var(--stage-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 800 / 300;
+  user-select: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--overlay);
+  text-align: center;
+}
+
+.overlay[hidden] { display: none; }
+
+.overlay__title {
+  margin: 0;
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.overlay__scores { margin: 0; font-size: 1rem; }
+.overlay__hint { margin: 0; font-size: 0.75rem; color: var(--muted); }
+
+.btn {
+  margin-top: 4px;
+  padding: 10px 28px;
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-fg);
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn:hover { opacity: 0.88; }
+.btn:focus-visible { outline: 3px solid var(--muted); outline-offset: 3px; }
+
+.hint {
+  margin: 12px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+kbd {
+  padding: 1px 6px;
+  font: inherit;
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--stage-bg);
+}

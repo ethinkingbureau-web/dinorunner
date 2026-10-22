@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dino Run</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="game">
+    <h1 class="game__title">Dino Run</h1>
+
+    <div class="stage">
+      <canvas id="game-canvas" width="800" height="300"
+              aria-label="Dino runner game. Press space or up arrow to jump."></canvas>
+
+      <div id="game-over" class="overlay" role="dialog" aria-labelledby="game-over-title" hidden>
+        <h2 id="game-over-title" class="overlay__title">Game Over</h2>
+        <p class="overlay__scores">
+          Score <strong id="final-score">0</strong>
+          <span aria-hidden="true">&middot;</span>
+          Best <strong id="best-score">0</strong>
+        </p>
+        <button id="restart-btn" class="btn" type="button">Restart</button>
+        <p class="overlay__hint">or press Space / Enter</p>
+      </div>
+    </div>
+
+    <p class="hint">
+      <kbd>Space</kbd> / <kbd>&uarr;</kbd> jump (hold for a higher jump) &nbsp;&middot;&nbsp;
+      <kbd>&darr;</kbd> duck &nbsp;&middot;&nbsp; tap the screen to jump
+    </p>
+  </main>
+
+  <!-- Plain scripts (not ES modules) so the game also works when opened via file:// -->
+  <script src="js/config.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/dino.js"></script>
+  <script src="js/obstacles.js"></script>
+  <script src="js/background.js"></script>
+  <script src="js/score.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
